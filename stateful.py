@@ -25,7 +25,7 @@ async def getMemoryChannel(name,parent):
 			if str(channel.type)=="text" and channel.name == name:
 				targetthread = channel
 		if targetthread==None:
-			await parent.create_text_channel(name)
+			targetthread = await parent.create_text_channel(name)
 
 	return targetthread
 

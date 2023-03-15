@@ -31,6 +31,7 @@ def interpret_answer_no_convo(chunk,names):
 
 
 def interpret_conversation_completion(chunk,names):
+	print("interpreting: "+chunk)
 	return "\n".join(remove_jambot_tags(
 		truncate(
 			ignoreuntil(chunk.split("\n"),is_jambot),

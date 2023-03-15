@@ -6,6 +6,7 @@ from discord import app_commands
 from dotenv import load_dotenv
 from stateful import *
 from interpret import *
+from personal import *
 
 load_dotenv()
 
@@ -46,7 +47,7 @@ async def on_message(message):
 
   await asyncio.sleep(3)
 
-  hist = [a async for a in channel.history(limit=10)]
+  hist = [a async for a in channel.history(limit=8)]
 
   if hist[0] != message: return
   # trunc = next((i for i,v in enumerate(hist) if v.author==client.user),None)
@@ -75,58 +76,50 @@ async def on_message(message):
       lines.append(f"{authname}: {line}")
   body = "\n".join(lines)
 
-  intentions = {}
-  for author in unique_authors:
-    intentions[author.id] = f"{readable_names[author.id]}'s intentions are "+interpret_answer_no_convo(openai.Completion.create(
-      engine="text-davinci-003",
-      prompt=f"""
-{body}
+  # bestway_memories = getpersonal(
+  #   "bestway",
+  #   lambda name:f"What is the best way to get {name} to participate in a game jam with you?",
+  #   state,
+  #   unique_authors
+  # )
+  game_ideas = getpersonal(
+    body,
+    "gameidea",
+    lambda name:f"What is {name}'s idea for a game? What stops them from developing it and submitting it to a game jam?",
+    state,
+    unique_authors,readable_names
+  )
 
-What are {readable_names[author.id]}'s intentions?
-{readable_names[author.id]}'s intentions are
-""".strip(),
-      max_tokens=500,
-      temperature=0.7,
-    ).choices[0].text.strip(),readable_names.values())
+  motivational_matrix = [f"""
+Jambot: {game_ideas[author.id]}
+""".strip() for author in unique_authors]
 
-  doublenewl = "\n\n"
-
-  bot_intention = "Jambot's short-term intention is "+interpret_answer_no_convo(openai.Completion.create(
-    engine="text-davinci-003",
-    prompt=f"""
-A conversation is taking place between Jambot and his friends.
-
-Jambot's long-term intentions are to do a game jam with his friends. That will only happen if his friends like him and are in a creative mood, so he needs to be fun to talk to and encourage creativity.
-
-{doublenewl.join([readable_names[author.id].strip() for author in unique_authors])}
-
-What is Jambot's short-term intention?
-Jambot's short-term intention is
-""".strip(),
-    max_tokens=500,
-    temperature=0.7,
-  ).choices[0].text.strip(),readable_names.values())
-
+  doublenewl = "\n"
 
   for attempt in range(2):
+    prompt=f"""
+Jambot's ultimate goal is to participate in a game jam with his friends.
+Here is what Jambot knows about his friends' game ideas:
+{doublenewl.join(motivational_matrix)}
 
+If something is preventing his friends from working on their game ideas, Jambot always asks what it is, and offers advice.
+Jambot is inspired by his friends' creativity, and he always wants to know more about his friends' game ideas, so he sometimes subtly steers the conversation towards game ideas.
+
+Jambot is talking with his friends in a group chat.
+{body}
+Jambot:
+""".strip()
+    print(prompt)
     nextlines = interpret_conversation_completion(openai.Completion.create(
       engine="text-davinci-003",
-      prompt=f"""
-A conversation is taking place between Jambot and his friends.
-
-f{bot_intention}
-
-{body}
-""".strip(),
+      prompt=prompt,
       max_tokens=500,
       temperature=0.7,
     ).choices[0].text.strip(),readable_names.values())
-    print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n"*4)
-    print(body)
-    print(intentions)
-    print(bot_intention)
-    print(nextlines)
+    # print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n"*4)
+    # print(body)
+    # print(intentions)
+    # print(nextlines)
 
     if nextlines:
       if nextlines.endswith(" What do you think?"):
