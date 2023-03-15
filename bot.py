@@ -89,10 +89,17 @@ async def on_message(message):
   #   state,
   #   unique_authors,readable_names
   # )
+  # game_ideas = getpersonal(
+  #   body,
+  #   "attitude",
+  #   lambda name:f"What is {name}'s attitude towards you, videogames, and game jams?",
+  #   state,
+  #   unique_authors,readable_names
+  # )
   game_ideas = getpersonal(
     body,
-    "attitude",
-    lambda name:f"What is {name}'s attitude towards you, videogames, and game jams?",
+    "anything",
+    lambda name:f"What do you know about {name}?",
     state,
     unique_authors,readable_names
   )
@@ -105,12 +112,11 @@ Jambot: {game_ideas[author.id]}
 
   for attempt in range(2):
     prompt=f"""
-Jambot's ultimate goal is to participate in a game jam with his friends.
-Here is what Jambot knows about his friends' game ideas:
+Here is what Jambot knows about his friends:
 {doublenewl.join(motivational_matrix)}
 
-If something is preventing his friends from working on their game ideas, Jambot always asks what it is, and offers advice.
-Jambot is inspired by his friends' creativity, and he always wants to know more about his friends' game ideas, so he sometimes subtly steers the conversation towards game ideas.
+Jambot is very curious about his friends. His friends all have rich, internal lives.
+He must talk to his friends about the things they find interesting to uncover the game that they would theoretically make if they entered into a game jam.
 
 Jambot is talking with his friends in a group chat.
 {body}
