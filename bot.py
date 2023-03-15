@@ -82,10 +82,17 @@ async def on_message(message):
   #   state,
   #   unique_authors
   # )
+  # game_ideas = getpersonal(
+  #   body,
+  #   "gameidea",
+  #   lambda name:f"What is {name}'s idea for a game? What stops them from developing it and submitting it to a game jam?",
+  #   state,
+  #   unique_authors,readable_names
+  # )
   game_ideas = getpersonal(
     body,
-    "gameidea",
-    lambda name:f"What is {name}'s idea for a game? What stops them from developing it and submitting it to a game jam?",
+    "attitude",
+    lambda name:f"What is {name}'s attitude towards you, videogames, and game jams?",
     state,
     unique_authors,readable_names
   )
@@ -116,109 +123,14 @@ Jambot:
       max_tokens=500,
       temperature=0.7,
     ).choices[0].text.strip(),readable_names.values())
-    # print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n"*4)
-    # print(body)
-    # print(intentions)
-    # print(nextlines)
 
     if nextlines:
-      if nextlines.endswith(" What do you think?"):
-        nextlines = nextlines[:-len(" What do you think?")]
-      if nextlines.endswith(" What do you all think?"):
-        nextlines = nextlines[:-len(" What do you all think?")]
       await placeholder.edit(content=nextlines)
       break
   else:
     await placeholder.delete()
 
   await saveState(memchannel,client,state)
-
-  # old_overwrite = channel.overwrites_for(guild.default_role)
-  # old_overwrite.send_messages = True
-  # overwrite = channel.overwrites_for(guild.default_role)
-  # overwrite.send_messages = False
-  # await channel.set_permissions(client.user, overwrite=old_overwrite)
-  # await channel.set_permissions(guild.default_role, overwrite=overwrite)
-
-
-  # await channel.set_permissions(guild.default_role, overwrite=old_overwrite)
-
-  return
-
-  # await message.channel.send("response")
-
-
-  # print(message)#create_text_channel
-  # print(dir(message.guild))
-
-
-
-
-# There is a conversation in a group chat with Lilac and Jambot.
-# Lilac is a cool gal.
-
-# Jambot's long-term intentions are to do a game jam with Lilac. That will only happen if Lilac likes him and is in a creative mood, so he needs to be fun to talk to and encourage creativity.
-
-# Lilac appears to be suggesting that they can have fun by changing their nicknames and creating new channels whenever they want. She also encourages people to make decisions on where the new channels should go.
-
-# What might Jambot's short-term intentions be?
-
-# Jambot's short-term intentions might be to keep the conversation going by suggesting fun activities, such as creating new nicknames and creating new channels. He could also ask Lilac for her opinion on where the new channels should go, or ask her for ideas on other fun activities they could do. Additionally, he could ask her about her creative interests to better gauge her mood and enthusiasm for a game jam.
-
-
-  # response = openai.Completion.create(
-  #   engine="text-davinci-003",
-  #   prompt=f"{message.content}",
-  #   max_tokens=500,
-  #   temperature=0.7,
-  # ).choices[0].text
-
-
-
-
-
-  # for channel in message.guild.text_channels:
-  #   print("found channel: ",channel,dir(channel),channel.created_at)
-  #   print("-=-=-")
-  #   print(channel.name=="general")
-  #   print(channel.type=="text")
-  #   print(channel.members)
-  #   print(channel.permissions_for)
-  #   print("-=-=-")
-
-
-      # text_channel_list.append(channel)
-
-
-  # print([a for a in dir(message.guild) if a.startswith('create')])
-  # print(message.guild.create_category.__code__.co_varnames)
-  return
-  # memory = retrieveState("botmemory")
-
-  # targetthread = None
-  # for thread in message.channel.threads:
-  #   print("found a thread!",thread)
-  #   async for message in thread.history():
-  #     if message.author != client.user: continue
-  #     print("me message: ",message)
-  #   await thread.send("this is some test data!")
-  #what if thread creation would fail due to unique thread names?
-  if client.user not in message.mentions: return
-
-  # Check if the bot is mentioned in the message
-  # if client.user in message.mentions:
-
-  response = openai.Completion.create(
-    engine="text-davinci-002",
-    prompt=f"{message.content}",
-    max_tokens=500,
-    temperature=0.5,
-  )
-
-  # Send the response as a message
-  await message.channel.send(response.choices[0].text)
-
-# start the bot
 client.run(TOKEN)
 
 

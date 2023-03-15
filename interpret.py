@@ -32,9 +32,16 @@ def interpret_answer_no_convo(chunk,names):
 
 def interpret_conversation_completion(chunk,names):
 	print("interpreting: "+chunk)
-	return "\n".join(remove_jambot_tags(
+	return cleanup_gpt_isms("\n".join(remove_jambot_tags(
 		truncate(
 			ignoreuntil(chunk.split("\n"),is_jambot),
 			is_name(names)
 		)
-	))
+	)))
+
+def cleanup_gpt_isms(chunk):
+	if chunk.endswith(" What do you think?"):
+		chunk = chunk[:-len(" What do you think?")]
+	if chunk.endswith(" What do you all think?"):
+		chunk = chunk[:-len(" What do you all think?")]
+	return chunk
